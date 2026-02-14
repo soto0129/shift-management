@@ -1,6 +1,7 @@
 {
+  "buildCommand": "npm run build",
   "functions": {
-    "api/optimize.py": {
+    "api/*.py": {
       "runtime": "python3.9"
     }
   }
