@@ -1,5 +1,0 @@
-# Vercel Serverless Functions (Python) の依存関係
-# /api/*.py ファイルで使用されるPythonパッケージを指定
-
-# PuLP: 線形計画法ライブラリ
-pulp==2.7.0
