@@ -24,7 +24,7 @@ function optimizeShift(inputData) {
   const staffInfo = {};
 
   staffList.forEach(staff => {
-    const staffId = staff.id || staff.name || `staff_${Math.random().toString(36).slice(2, 8)}`;
+    const staffId = staff.id || staff.name;
     staffInfo[staffId] = {
       preferredDates: new Set(staff.preferred_dates || []),
       unavailableDates: new Set(staff.unavailable_dates || []),
@@ -57,29 +57,24 @@ function optimizeShift(inputData) {
     }
   }
 
-  const resultSchedule = [];
-  const warnings = [];
-
+  // フロントエンドが期待する形式に変換
+  // { staff_id, date, start_time, end_time } の配列
+  const shifts = [];
   for (const date of dates) {
-    const assigned = schedule[date];
-    resultSchedule.push({ date, staff: assigned, count: assigned.length });
-    if (assigned.length < minStaff) {
-      warnings.push(`${date}: 最低人数 ${minStaff}人を満たせません（${assigned.length}人）`);
+    const assignedStaff = schedule[date];
+    for (const staffId of assignedStaff) {
+      shifts.push({
+        staff_id: staffId,
+        date: date,
+        start_time: '09:00',
+        end_time: '17:00',
+      });
     }
   }
 
-  const totalAssignments = Object.values(staffWorkCount).reduce((sum, count) => sum + count, 0);
-
   return {
     success: true,
-    schedule: resultSchedule,
-    stats: {
-      total_assignments: totalAssignments,
-      staff_distribution: staffWorkCount,
-      average_per_staff: staffList.length > 0 ? Math.round((totalAssignments / staffList.length) * 10) / 10 : 0,
-      days_with_shortage: warnings.length,
-    },
-    warnings: warnings.length > 0 ? warnings : undefined,
+    shifts: shifts,
   };
 }
 
@@ -117,7 +112,7 @@ export async function POST(request) {
       constraints: constraints || {}
     }
     
-    // 直接関数を呼び出し（HTTPリクエストなし）
+    // 直接関数を呼び出し
     const result = optimizeShift(requestData)
     
     if (result.success) {
