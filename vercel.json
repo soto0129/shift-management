@@ -1,8 +1,0 @@
-{
-  "buildCommand": "npm run build",
-  "functions": {
-    "api/*.py": {
-      "runtime": "python3.9"
-    }
-  }
-}
